@@ -3,8 +3,6 @@ import { registerApolloClient } from "@apollo/experimental-nextjs-app-support/rs
 
 import { BACKEND_URL } from '../utils/constants'
 
-
-
 export const { getClient } = registerApolloClient(() => {
   return new ApolloClient({
     cache: new InMemoryCache(),
