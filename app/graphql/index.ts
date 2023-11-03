@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@apollo/client'
 
 import { GET_TODOS } from './query'
-import { CREATE_TODO, UPDATE_TODO, DELETE_TODO } from './mutations'
+import { CREATE_TODO, DELETE_TODO, UPDATE_TODO_COMPLETE } from './mutations'
 
 export const useGetTodos = () => {
     const { data, loading, error } = useQuery(GET_TODOS)
@@ -23,15 +23,16 @@ export const useCreateTodo = () => {
     }
 }
 
-export const useUpdateTodo = () => {
-    const [updateTodo] = useMutation(UPDATE_TODO, {
+export const useUpdateTodoComplete = () => {
+    const [updateTodoComplete] = useMutation(UPDATE_TODO_COMPLETE, {
         refetchQueries: [{ query: GET_TODOS }]
     })
 
     return {
-        updateTodo
+        updateTodoComplete
     }
 }
+
 
 export const useDeleteTodo = () => {
     const [deleteTodo] = useMutation(DELETE_TODO, {

@@ -1,31 +1,34 @@
 'use client'
-import { useState, useEffect, MouseEvent } from 'react';
+import { useCallback, useState, useEffect, MouseEvent } from 'react';
+import Box from '@mui/system/Box';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { useCreateTodo, useDeleteTodo, useUpdateTodo } from '../graphql';
+import { useCreateTodo, useDeleteTodo, useUpdateTodoComplete } from '../graphql';
 import TodoHeader from '../components/Header';
 
 interface Todo {
-  id: number;
+  id: string;
   title: string;
   completed: boolean;
 }
-
+  
 export default function TodoList({ tasks }: { tasks: Todo[]}) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const { createTodo } = useCreateTodo();
   const { deleteTodo } = useDeleteTodo();
-  const { updateTodo } = useUpdateTodo();
+  const { updateTodoComplete } = useUpdateTodoComplete();
 
   //Create one blank todo
   const handleClickCreate = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
-    setTodos((prev) => [...prev, { id: prev.length + 1, title: '', completed: false }]);
+    // setTodos((prev) => [...prev, { id: prev.length + 1, title: '', completed: false }]);
   }
 
   // Update Title
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => (index: number) => {
     const { value } = event.target;
-    setTodos((prev) => [...prev, { id: prev.length + 1, title: value, completed: false }]);
+    // setTodos((prev) => [...prev, { id: prev.length + 1, title: value, completed: false }]);
   }
 
   // Save Todo
@@ -36,20 +39,15 @@ export default function TodoList({ tasks }: { tasks: Todo[]}) {
       },
     })
   }
-  // Update todo
-  const handleUpdateTodoTitle = (index: number, title: String) => {
-    updateTodo({
-      variables: {
-        ...todos[index],
-        title,
-      },
-    })
-  }
 
   // Completed todo
-  const handleCheckboxClick = (todo: Todo) => {
-    updateTodo({ variables: { ...todo, completed: true } })
-  }
+  const handleCheckboxClick = useCallback(async (index: number) => {
+    await updateTodoComplete({ variables: { id: todos[index].id } })
+    // update todos state
+    const newTodos = [...todos];
+    newTodos[index].completed = !newTodos[index].completed;
+    setTodos([...newTodos]);
+  }, [updateTodoComplete, todos, setTodos]);
 
   // Delete todo
   const handleDeleteTodo = (id: String) => {
@@ -67,15 +65,20 @@ export default function TodoList({ tasks }: { tasks: Todo[]}) {
             Create Task
       </button>
 
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            <input type="checkbox" checked={todo.completed} onChange={()=> handleCheckboxClick(todo)} />
-            <span>{todo.title}</span>
-
-          </li>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        {todos.map(({ id, completed, title }, index) => (
+            <FormControlLabel
+            key={id}
+            control={<Checkbox
+                checked={completed}
+                onChange={()=> handleCheckboxClick(index)}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />}
+            label={title}
+          />
+            
         ))}
-      </ul>
+        </Box>
     </div>
   );
 }

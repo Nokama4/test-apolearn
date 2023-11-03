@@ -2,11 +2,8 @@ import { gql } from "@apollo/client";
 
 // CREATE
 export const CREATE_TODO = gql`
-    mutation todo($title: String!) {
-        createTodo(
-            variables: {
-                title: $title
-            }
+    mutation createTodo($createTodoInput: TodoInput!) {
+        createTodo(createTodoInput: $createTodoInput
         ) {
             id
             title
@@ -16,15 +13,9 @@ export const CREATE_TODO = gql`
 `;
 
 // UPDATE
-export const UPDATE_TODO = gql`
-    mutation updateTodo($id: ID!, $title: String, $completed: Boolean) {
-        updateTodo(
-            variables: {
-                id: $id
-                title: $title
-                completed: $completed
-            }
-        ) {
+export const UPDATE_TODO_COMPLETE = gql`
+    mutation updateTodo($id: String!) {
+        updateTodo(id: $id) {
             id
             title
             completed
@@ -34,12 +25,8 @@ export const UPDATE_TODO = gql`
 
 // DELETE
 export const DELETE_TODO = gql`
-    mutation DeleteTodo($id: ID!) {
-        deleteTodo(
-            variables: {
-                id: $id
-            }
-        ) {
+    mutation deleteTodo($id: ID!) {
+        deleteTodo(id: $id) {
             id
             title
             completed
